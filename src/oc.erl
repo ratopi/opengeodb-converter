@@ -17,7 +17,24 @@
 %%%===================================================================
 
 main([]) ->
-	io:fwrite("Usage: oc [<database file> ..]~n");
+	io:fwrite(
+		"~n"
+		"Usage: oc [<database file> ..]~n"
+		"       - parses given files~n"
+		"~n"
+		"       oc *.tab~n"
+		"       - parses all *.tab-files~n~n"
+	);
+
+% a stupid simple fast forward globbing
+main(["*.tab"]) ->
+	L = lists:filter(
+		fun is_tab_file/1,
+		case file:list_dir_all(".") of
+			{ok, X} -> X
+		end
+	),
+	main(L);
 
 main(Files) ->
 	lists:foreach(
@@ -45,11 +62,16 @@ convert(File) ->
 
 				{ok, <<$#, HeaderLine/binary>>} ->
 					Headers = split_line(HeaderLine),
-					{ok, OUT} = file:open(File ++ ".json", [write, binary]),
+
+					OutFile = File ++ ".json",
+					{ok, OUT} = file:open(OutFile, [write, binary]),
 					file:write(OUT, <<"[">>),
+
 					convert(IN, OUT, Headers, false),
+
 					file:write(OUT, <<"]">>),
-					file:close(OUT);
+					file:close(OUT),
+					io:fwrite("wrote ~p~n", [OutFile]);
 
 				_ ->
 					io:fwrite("ERROR: ~p HAS NO HEADER LINE~n", [File])
@@ -95,3 +117,10 @@ convert_to_map(_, [], Map) ->
 	Map;
 convert_to_map([K | KT], [V | VT], Map) ->
 	convert_to_map(KT, VT, maps:put(K, V, Map)).
+
+
+is_tab_file(File) ->
+	case lists:reverse(File) of
+		[$b, $a, $t, $. | _] -> true; % it ends with ".tab" ;-)
+		_ -> false
+	end.
