@@ -1,4 +1,8 @@
-FROM docker.io/library/erlang:24.2.1.0 as builder
+FROM docker.io/library/erlang:26.1.2.0-slim as base
+
+# ---
+
+FROM base as builder
 
 WORKDIR /BUILD/
 
@@ -8,7 +12,7 @@ RUN rebar3 escriptize
 
 # ---
 
-FROM docker.io/library/erlang:24.2.1.0-slim
+FROM base
 
 WORKDIR /app/
 

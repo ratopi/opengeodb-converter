@@ -1,5 +1,5 @@
 {application, oc, [
-	{description, "An OTP application"},
+	{description, "Converts OpenGeoDB CSV data files to JSON"},
 	{vsn, "1.0.0"},
 
 	{registered, []},
@@ -14,6 +14,6 @@
 	{env, []},
 	{modules, []},
 
-	{licenses, ["Apache 2.0"]},
+	{licenses, ["MIT License"]},
 	{links, []}
 ]}.
